@@ -16,10 +16,11 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+local _EMPTY = {}
 
 local assert = assert;
 local error = error;
-local getfenv = getfenv;
+local getfenv = getfenv or function() return _EMPTY end;
 local getmetatable = getmetatable;
 local ipairs = ipairs;
 local pairs = pairs;
@@ -213,7 +214,7 @@ function dump (t, max)
     [REVERSE_T] = {[[
 local select = select;
 local loadstring = loadstring;
-local setfenv = setfenv;
+local setfenv = setfenv or function() end;
 local setmetatable = setmetatable;
 local setupvalue = debug.setupvalue;
 local upvaluejoin = debug.upvaluejoin or function () end;
