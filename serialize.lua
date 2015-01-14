@@ -16,6 +16,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+
 local assert = assert;
 local error = error;
 local getfenv = getfenv;
@@ -29,8 +30,12 @@ local tostring = tostring;
 local type = type;
 local strdump = string.dump;
 local huge = math.huge;
+
+local debug = select(2, pcall(require, "debug")) or {}
 local getupvalue = debug.getupvalue or function() return nil end;
-local upvalue = debug.upvalue or function() return {} end;
+local upvalueid = debug.upvalueid or function() return {} end;
+
+local table = require "table"
 local concat = table.concat;
 
 module("serialize");
@@ -87,12 +92,12 @@ local function serialize_value(values, v, l)
           local vupv, upv;
           c[#c+1] = ", ";
           if upvalue then -- Is debug.upvalue available?
-            upv = upvalue(v, i);
+            upv = upvalueid(v, i);
             vupv = values[UPVALUES][upv];
           end
           if vupv then
             s = s or {};
-            s[#s+1] = "\nshareupvalue(";
+            s[#s+1] = "\nupvaluejoin(";
             s[#s+1] = l;
             s[#s+1] = ", ";
             s[#s+1] = i;
@@ -211,7 +216,7 @@ local loadstring = loadstring;
 local setfenv = setfenv;
 local setmetatable = setmetatable;
 local setupvalue = debug.setupvalue;
-local shareupvalue = debug.shareupvalue or function () end;
+local upvaluejoin = debug.upvaluejoin or function () end;
 local function __close(f, ...)
   for i = 1, select("#", ...) do
     setupvalue(f, i, (select(i, ...)));
